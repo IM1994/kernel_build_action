@@ -48,7 +48,7 @@ jobs:
 
       - name: Compiling
         run: |
-          if [ "${DEVICE}" = "tissot" ]; then
+          if [ "${DEVICE}" = "X01BD" ]; then
             wget https://raw.githubusercontent.com/sirnewbies/kernel_build_action/main/scripts/tissot_build_script.sh
             bash tissot_build_script.sh
           elif [ "${DEVICE}" = "tissot-mainline" ]; then
