@@ -70,7 +70,6 @@ sendinfo() {
 *Date*: \`${DATE}\`
 *Device*: \`${DEVICE} (${CODENAME})\`
 *Branch*: \`$(git rev-parse --abbrev-ref HEAD)\`
-*Last Commit*: [${COMMIT_HASH}](${REPO}/commit/${COMMIT_HASH})
 *Compiler*: \`${KBUILD_COMPILER_STRING}\`
 *Build Status*: \`${STATUS}\`"
 }
@@ -120,7 +119,7 @@ compile() {
 # Zipping
 zipping() {
     cd AnyKernel || exit 1
-    zip -r9 noob-kernel-testing-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
+    zip -r9 Kiwkiw-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
     cd ..
 }
 
