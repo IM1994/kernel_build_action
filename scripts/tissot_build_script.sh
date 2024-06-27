@@ -65,7 +65,7 @@ tgs() {
 # Send Build Info
 sendinfo() {
     tg "
-• sirCompiler Action •
+• IMcompiler Action •
 *Building on*: \`Github actions\`
 *Date*: \`${DATE}\`
 *Device*: \`${DEVICE} (${CODENAME})\`
