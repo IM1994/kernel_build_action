@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       device:
-          description: 'device codename (e.g topaz/tissot)'
+          description: 'device codename (e.g x01bd)'
           required: true
       repo:
           description: 'Kernel source link (dont include . git at the end)'
@@ -48,7 +48,7 @@ jobs:
 
       - name: Compiling
         run: |
-          if [ "${DEVICE}" = "X01BD" ]; then
+          if [ "${DEVICE}" = "x01bd" ]; then
             wget https://raw.githubusercontent.com/sirnewbies/kernel_build_action/main/scripts/tissot_build_script.sh
             bash tissot_build_script.sh
           elif [ "${DEVICE}" = "tissot-mainline" ]; then
