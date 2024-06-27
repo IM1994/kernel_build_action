@@ -101,7 +101,7 @@ compile() {
         rm -rf out && mkdir -p out
     fi
 
-    make O=out ARCH="${ARCH}" vendor/msm8953-romi_defconfig vendor/xiaomi/tissot.config
+    make O=out ARCH="${ARCH}" asus/X01BD_defconfig
     make -j"${PROCS}" O=out \
         ARCH=$ARCH \
         CC="clang" \
