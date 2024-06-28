@@ -100,7 +100,7 @@ compile() {
         rm -rf out && mkdir -p out
     fi
 
-    make O=out ARCH="${ARCH}" asus/X01BD_defconfig
+    make O=out ARCH="${ARCH}" X01BD_defconfig
     make -j"${PROCS}" O=out \
         ARCH=$ARCH \
         CC="clang" \
