@@ -9,8 +9,8 @@ clang() {
     rm -rf clang
     echo "Cloning clang"
     if [ ! -d "clang" ]; then
-        git clone https://gitlab.com/LeCmnGend/proton-clang -b clang-15 --depth=1 clang
-        KBUILD_COMPILER_STRING="Proton clang 15.0"
+        git clone -q https://gitlab.com/PixelOS-Devices/playgroundtc.git --depth=1 -b 17 clang
+        KBUILD_COMPILER_STRING="Cosmic clang 17.0"
         PATH="${PWD}/clang/bin:${PATH}"
     fi
     sudo apt install -y ccache
