@@ -52,7 +52,7 @@ jobs:
             wget https://raw.githubusercontent.com/IM1994/kernel_build_action/main/scripts/tissot_build_script.sh
             bash tissot_build_script.sh
           elif [ "${DEVICE}" = "X01BD" ]; then
-            wget https://raw.githubusercontent.com/sirnewbies/kernel_build_action/main/scripts/tissot-mainline_build_script.sh
+            wget https://raw.githubusercontent.com/IM1994/kernel_build_action/main/scripts/tissot-mainline_build_script.sh
             bash tissot-mainline_build_script.sh
           elif [ "${DEVICE}" = "topaz" ]; then 
             wget https://raw.githubusercontent.com/sirnewbies/kernel_build_action/main/scripts/topaz_build_script.sh
