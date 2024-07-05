@@ -26,15 +26,15 @@ export CACHE
 export KBUILD_COMPILER_STRING
 ARCH=arm64
 export ARCH
-KBUILD_BUILD_HOST="sirnewbies"
+KBUILD_BUILD_HOST="IM"
 export KBUILD_BUILD_HOST
-KBUILD_BUILD_USER="noob-server"
+KBUILD_BUILD_USER="IM1994"
 export KBUILD_BUILD_USER
-DEVICE="Xiaomi Mi A1"
+DEVICE="MAX PRO M2"
 export DEVICE
-CODENAME="tissot"
+CODENAME="X01BD"
 export CODENAME
-DEFCONFIG="defconfig xiaomi-tissot.config"
+#DEFCONFIG="defconfig xiaomi-tissot.config"
 export DEFCONFIG
 COMMIT_HASH=$(git rev-parse --short HEAD)
 export COMMIT_HASH
@@ -116,13 +116,14 @@ compile() {
         exit 1
     fi
 
-    git clone --depth=1 https://github.com/sirnewbies/Anykernel3.git AnyKernel -b tissot
+    
+    git clone --depth=1 https://github.com/IM1994/AnyKernel3.git AnyKernel -b 4.4
     cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
 }
 # Zipping
 zipping() {
     cd AnyKernel || exit 1
-    zip -r9 Another-Kernel-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
+    zip -r9 WikWik-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
     cd ..
 }
 
