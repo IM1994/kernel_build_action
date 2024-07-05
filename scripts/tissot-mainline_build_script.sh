@@ -103,7 +103,7 @@ compile() {
 
     ./update_ksu.sh
 
-    make O=out ARCH="${ARCH}" "${DEFCONFIG}"
+    make O=out ARCH="${ARCH}" X01BD_defconfig
     make -j"${PROCS}" O=out \
         ARCH=$ARCH \
         CC="clang" \
