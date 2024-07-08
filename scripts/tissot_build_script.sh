@@ -36,7 +36,7 @@ CODENAME="X01BD"
 export CODENAME
 # DEFCONFIG=""
 export DEFCONFIG
-COMMIT_HASH=$(git rev-parse --short HEAD)
+COMMIT_HASH=$(git log --oneline --pretty=tformat:"%h  %s  [%an]" --abbrev-commit --abbrev=1 -1)
 export COMMIT_HASH
 PROCS=$(nproc --all)
 export PROCS
@@ -71,7 +71,7 @@ sendinfo() {
 *Device*: \`${DEVICE} (${CODENAME})\`
 *Branch*: \`$(git rev-parse --abbrev-ref HEAD)\`
 *Compiler*: \`${KBUILD_COMPILER_STRING}\`
-*Last Commit*: [${COMMIT_HASH}](${REPO}/commit/${COMMIT_HASH})
+*Last Commit*: \'${COMMIT_HASH}
 *Build Status*: \`${STATUS}\`"
 }
 
