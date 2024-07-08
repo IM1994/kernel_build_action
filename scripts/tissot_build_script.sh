@@ -71,7 +71,7 @@ sendinfo() {
 *Device*: \`${DEVICE} (${CODENAME})\`
 *Branch*: \`$(git rev-parse --abbrev-ref HEAD)\`
 *Compiler*: \`${KBUILD_COMPILER_STRING}\`
-*Last Commit*: \'${COMMIT_HASH}
+*Last Commit*: \`${COMMIT_HASH}\`
 *Build Status*: \`${STATUS}\`"
 }
 
