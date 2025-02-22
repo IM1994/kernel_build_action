@@ -107,15 +107,42 @@ compile() {
         CC="clang" \
         LLVM=1 \
         CROSS_COMPILE=aarch64-linux-gnu- \
-        CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+        CROSS_COMPILE_ARM32=arm-linux-gnueabi- 2>&1 | tee error.log
 
-    if ! [ -a "$IMAGE" ]; then
-        finderr
-        exit 1
-    fi
-
-    git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git AnyKernel -b master
-    cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
+    
+    if [ -f "$IMG" ]; then
+                echo -e "$green << Build completed in $(($Diff / 60)) minutes and $(($Diff % 60)) seconds >> \n $white"
+		echo -e "$green << cloning AnyKernel from your repo >> \n $white"
+                git clone --depth=1 "$AnyKernel" --single-branch -b "$AnyKernelbranch" zip
+                echo -e "$yellow << making kernel zip >> \n $white"
+                cp -r "$IMG" zip/
+                cp -r "$dtbo" zip/
+                cp -r "$dtb" zip/
+                cd zip
+                export ZIP="test"-"kernel"-"$CODENAME"
+                zip -r9 "$ZIP" * -x .git README.md LICENSE *placeholder
+                curl -sLo zipsigner-3.0.jar https://gitlab.com/itsshashanksp/zipsigner/-/raw/master/bin/zipsigner-3.0-dexed.jar
+                java -jar zipsigner-3.0.jar "$ZIP".zip "$ZIP"-signed.zip
+                tg_post_msg "Kernel successfully compiled uploading ZIP" "$CHATID"
+                tg_post_build "$ZIP"-signed.zip "$CHATID"
+                tg_post_msg "done" "$CHATID"
+                cd ..
+                rm -rf error.log
+                rm -rf out
+                rm -rf zip
+                rm -rf testing.log
+                rm -rf zipsigner-3.0.jar
+                exit
+        else
+                echo -e "$red << Failed to compile the kernel , Check up to find the error >>$white"
+                tg_post_msg "Kernel failed to compile uploading error log"
+                tg_error "error.log" "$CHATID"
+                rm -rf out
+                rm -rf testing.log
+                rm -rf error.log
+                rm -rf zipsigner-3.0.jar
+                exit 1
+        fi
 }
 # Zipping
 zipping() {
