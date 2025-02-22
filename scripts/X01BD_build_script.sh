@@ -114,7 +114,7 @@ compile() {
         exit 1
     fi
 
-    git clone --depth=1 https://github.com/IM1994/AnyKernel3.git AnyKernel -b 4.19
+    git clone --depth=1 https://github.com/osm0sis/AnyKernel3.git AnyKernel -b master
     cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
 }
 # Zipping
