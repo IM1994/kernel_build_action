@@ -17,6 +17,9 @@ clang() {
     echo "Done"
 }
 
+AnyKernel="https://github.com/IM1994/AnyKernel3.git"
+AnyKernelbranch="4.19"
+
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 DATE=$(date +"%Y%m%d-%H%M")
 START=$(date +"%s")
