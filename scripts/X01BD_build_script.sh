@@ -1,100 +1,133 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#set -e
+# Dependencies
+rm -rf kernel
+git clone $REPO -b $BRANCH kernel
+cd kernel
 
-## Copy this script inside the kernel directory
-KERNEL_DEFCONFIG=asus/X01BD_defconfig ## Ini defconfignya setiap type hape beda2 (redmi note 10 pro menggunakan sweet_defconfig)
-ANYKERNEL3_DIR=$PWD/AnyKernel3/ ## ini anykernel nya gunanya untuk membukus hasil compile untuk siap flash
-FINAL_KERNEL_ZIP=Kiwkiw Kernel-linux -$(date '+%Y%m%d').zip ## INI NAMA KERNEL zip NYA
-export PATH="$HOME/cosmic/bin:$PATH"
-export ARCH=arm64
-export SUBARCH=arm64
-export KBUILD_COMPILER_STRING="$($HOME/cosmic/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')"
+clang() {
+    rm -rf clang
+    echo "Cloning clang"
+    if [ ! -d "clang" ]; then
+        git clone https://gitlab.com/PixelOS-Devices/playgroundtc.git --depth=1 -b 15 clang
+        KBUILD_COMPILER_STRING="Cosmic clang 15.0 x IM"
+        PATH="${PWD}/clang/bin:${PATH}"
+    fi
+    sudo apt install -y ccache
+    echo "Done"
+}
 
-git clone --depth=1 -b 4.19 https://github.com/IM1994/AnyKernel3.git AnyKernel3
-
-if ! [ -d "$HOME/cosmic" ]; then
-echo "Cosmic clang not found! Cloning..."
-if ! git clone -q https://gitlab.com/PixelOS-Devices/playgroundtc.git --depth=1 -b 15 ~/cosmic; then ## ini Clang nya tools untuk membangun/compile kernel nya (tidak semua kernel mendukung clang)
-echo "Cloning failed! Aborting..."
-exit 1
+IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
+DATE=$(date +"%Y%m%d-%H%M")
+START=$(date +"%s")
+KERNEL_DIR=$(pwd)
+CACHE=1
+export CACHE
+export KBUILD_COMPILER_STRING
+ARCH=arm64
+export ARCH
+KBUILD_BUILD_HOST="IM"
+export KBUILD_BUILD_HOST
+KBUILD_BUILD_USER="IM1994"
+export KBUILD_BUILD_USER
+DEVICE="ASUS MAX PRO M2"
+export DEVICE
+CODENAME="X01BD"
+export CODENAME
+# DEFCONFIG=""
+export DEFCONFIG
+COMMIT_HASH=$(git log --oneline --pretty=tformat:"%h  %s  [%an]" --abbrev-commit --abbrev=1 -1)
+export COMMIT_HASH
+PROCS=$(nproc --all)
+export PROCS
+STATUS=STABLE
+export STATUS
+source "${HOME}"/.bashrc && source "${HOME}"/.profile
+if [ $CACHE = 1 ]; then
+    ccache -M 100G
+    export USE_CCACHE=1
 fi
-fi
+LC_ALL=C
+export LC_ALL
 
-# Speed up build process
-MAKE="./makeparallel"
+tg() {
+    curl -sX POST https://api.telegram.org/bot"${token}"/sendMessage -d chat_id="${chat_id}" -d parse_mode=Markdown -d disable_web_page_preview=true -d text="$1" &>/dev/null
+}
 
-BUILD_START=$(date +"%s")
-blue='\033[0;34m'
-cyan='\033[0;36m'
-yellow='\033[0;33m'
-red='\033[0;31m'
-nocol='\033[0m'
+tgs() {
+    MD5=$(md5sum "$1" | cut -d' ' -f1)
+    curl -fsSL -X POST -F document=@"$1" https://api.telegram.org/bot"${token}"/sendDocument \
+        -F "chat_id=${chat_id}" \
+        -F "parse_mode=Markdown" \
+        -F "caption=$2 | *MD5*: \`$MD5\`"
+}
 
-# Clean build always lol
-echo "**** Cleaning ****"
-mkdir -p out
-make O=out clean
+# Send Build Info
+sendinfo() {
+    tg "
+• IMcompiler Action •
+*Building on*: \`Github actions\`
+*Date*: \`${DATE}\`
+*Device*: \`${DEVICE} (${CODENAME})\`
+*Branch*: \`$(git rev-parse --abbrev-ref HEAD)\`
+*Compiler*: \`${KBUILD_COMPILER_STRING}\`
+*Last Commit*: \`${COMMIT_HASH}\`
+*Build Status*: \`${STATUS}\`"
+}
 
-echo "**** Kernel defconfig is set to $KERNEL_DEFCONFIG ****"
-echo -e "$blue***********************************************"
-echo "          BUILDING KERNEL          "
-echo -e "***********************************************$nocol"
-make $KERNEL_DEFCONFIG O=out
-make -j$(nproc --all) O=out \
-                              ARCH=arm64 \
-                              LLVM=1 \
-                              LLVM_IAS=1 \
-                              AR=llvm-ar \
-                              NM=llvm-nm \
-                              LD=ld.lld \
-                              OBJCOPY=llvm-objcopy \
-                              OBJDUMP=llvm-objdump \
-                              STRIP=llvm-strip \
-                              CC=clang \
-                              CROSS_COMPILE=aarch64-linux-gnu- \
-                              CROSS_COMPILE_ARM32=arm-linux-gnueabi
+# Push kernel to channel
+push() {
+    cd AnyKernel || exit 1
+    ZIP=$(echo *.zip)
+    tgs "${ZIP}" "Build took $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s). | For *${DEVICE} (${CODENAME})* | ${KBUILD_COMPILER_STRING}"
+}
 
-echo "**** Verify Image.gz-dtb & dtbo.img ****"
-ls $PWD/out/arch/arm64/boot/Image.gz-dtb
-ls $PWD/out/arch/arm64/boot/dtbo.img
-ls $PWD/out/arch/arm64/boot/dtb.img
+# Catch Error
+finderr() {
+    curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" \
+        -d chat_id="$chat_id" \
+        -d "disable_web_page_preview=true" \
+        -d "parse_mode=markdown" \
+        -d sticker="CAACAgIAAxkBAAED3JViAplqY4fom_JEexpe31DcwVZ4ogAC1BAAAiHvsEs7bOVKQsl_OiME" \
+        -d text="Build throw an error(s)"
+    error_sticker
+    exit 1
+}
 
-# Anykernel 3 time!!
-echo "**** Verifying AnyKernel3 Directory ****"
-ls $ANYKERNEL3_DIR
-echo "**** Removing leftovers ****"
-rm -rf $ANYKERNEL3_DIR/Image.gz-dtb
-rm -rf $ANYKERNEL3_DIR/dtbo.img
-rm -rf $ANYKERNEL3_DIR/dtb.img
-rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
+# Compile
+compile() {
 
-echo "**** Copying Image.gz-dtb & dtbo.img ****"
-cp $PWD/out/arch/arm64/boot/Image.gz-dtb $ANYKERNEL3_DIR/
-cp $PWD/out/arch/arm64/boot/dtbo.img $ANYKERNEL3_DIR/
-cp $PWD/out/arch/arm64/boot/dtb.img $ANYKERNEL3_DIR/
+    if [ -d "out" ]; then
+        rm -rf out && mkdir -p out
+    fi
 
-echo "**** Time to zip up! ****"
-cd $ANYKERNEL3_DIR/
-zip -r9 "../$FINAL_KERNEL_ZIP" * -x README $FINAL_KERNEL_ZIP
+    make O=out ARCH="${ARCH}" asus/X01BD_defconfig
+    make -j"${PROCS}" O=out \
+        ARCH=$ARCH \
+        CC="clang" \
+        LLVM=1 \
+        CROSS_COMPILE=aarch64-linux-gnu- \
+        CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-echo "**** Done, here is your sha1 ****"
-cd ..
-rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
-rm -rf $ANYKERNEL3_DIR/Image.gz-dtb
-rm -rf $ANYKERNEL3_DIR/dtbo.img
-rm -rf $ANYKERNEL3_DIR/dtb.img
-rm -rf out/
+    if ! [ -a "$IMAGE" ]; then
+        finderr
+        exit 1
+    fi
 
-sha1sum $FINAL_KERNEL_ZIP
+    git clone --depth=1 https://github.com/IM1994/AnyKernel3.git AnyKernel -b 4.19
+    cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
+}
+# Zipping
+zipping() {
+    cd AnyKernel || exit 1
+    zip -r9 Kiwkiw-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
+    cd ..
+}
 
-BUILD_END=$(date +"%s")
-DIFF=$(($BUILD_END - $BUILD_START))
-echo -e "$yellow Build completed in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds.$nocol"
-
-echo "**** Uploading your zip now ****"
-if command -v curl &> /dev/null; then
-curl -T $FINAL_KERNEL_ZIP temp.sh
-else
-echo "Zip: $FINAL_KERNEL_ZIP"
-fi
+clang
+sendinfo
+compile
+zipping
+END=$(date +"%s")
+DIFF=$((END - START))
+push
