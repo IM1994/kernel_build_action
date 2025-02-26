@@ -26,9 +26,9 @@ export CACHE
 export KBUILD_COMPILER_STRING
 ARCH=arm64
 export ARCH
-KBUILD_BUILD_HOST="IM"
+KBUILD_BUILD_HOST="Linux-kernel_https://sourceforge.net/projects/kernel-im964-x01bd/"
 export KBUILD_BUILD_HOST
-KBUILD_BUILD_USER="IM1994"
+KBUILD_BUILD_USER="t.me/@IkhsanMah"
 export KBUILD_BUILD_USER
 DEVICE="ASUS MAX PRO M2"
 export DEVICE
@@ -120,7 +120,7 @@ compile() {
 # Zipping
 zipping() {
     cd AnyKernel || exit 1
-    zip -r9 Kiwkiw-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
+    zip -r9 Kiwkiw™-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
     cd ..
 }
 
