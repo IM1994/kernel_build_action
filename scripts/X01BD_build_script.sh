@@ -120,7 +120,7 @@ compile() {
 # Zipping
 zipping() {
     cd AnyKernel || exit 1
-    zip -r9 Kiwkiw-"${BRANCH}"-U1.4-"${CODENAME}"-"${DATE}".zip ./*
+    zip -r9 Kiwkiw-U1.4-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
     cd ..
 }
 
