@@ -28,7 +28,7 @@ ARCH=arm64
 export ARCH
 KBUILD_BUILD_HOST="Linux-kernel_https://sourceforge.net/projects/kernel-im964-x01bd/"
 export KBUILD_BUILD_HOST
-KBUILD_BUILD_USER="t.me/@IkhsanMah"
+KBUILD_BUILD_USER="t.me/@IM1994"
 export KBUILD_BUILD_USER
 DEVICE="ASUS MAX PRO M2"
 export DEVICE
