@@ -10,7 +10,7 @@ clang() {
     echo "Cloning clang"
     if [ ! -d "clang" ]; then
         git clone https://gitlab.com/PixelOS-Devices/playgroundtc.git --depth=1 -b 15 clang
-        KBUILD_COMPILER_STRING="Cosmic clang 15.0 x IM"
+        KBUILD_COMPILER_STRING="Cosmic clang 15.0♦IM994♦"
         PATH="${PWD}/clang/bin:${PATH}"
     fi
     sudo apt install -y ccache
@@ -120,7 +120,7 @@ compile() {
 # Zipping
 zipping() {
     cd AnyKernel || exit 1
-    zip -r9 Kiwkiw-U1.4-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
+    zip -r9 Kiwkiw-U1.1-"${BRANCH}"-"${CODENAME}"-"${DATE}".zip ./*
     cd ..
 }
 
